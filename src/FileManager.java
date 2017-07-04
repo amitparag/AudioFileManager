@@ -1,24 +1,34 @@
 /*
- The Size of r.mp3 in the INputDir is 2.42 MB.
+ The Size of r.mp3 in the InputDir is 2.42 MB.
  40 files of 64K are created in the UploadDir with the size of the last part being 11KB
-
+ The chunks are names r.mp3.001 , r.mp3.002 ... r.mp3.040
 
   */
 
 import java.io.*;
+import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-
+import aws.example.s3.XferMgrProgress;
+import com.amazonaws.AmazonServiceException;
+import com.amazonaws.services.s3.transfer.TransferManager;
+import com.amazonaws.services.s3.transfer.Upload;
+import com.amazonaws.services.s3.transfer.MultipleFileUpload;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
 public class FileManager {
 
-
+    private static ArrayList<File> files = new ArrayList<File>();  //To store the chunks in an ArrayList
 
     public static void splitUpload(File file) throws IOException {
         int number = 1;   // To name the chunks. e.g bach.mp3.001, bach.mp3.002 ......
 
         int sizeOfChunks = 65000;   //Size of each split part
 
-        List<File> listOfFiles = new LinkedList<>();   //TO store the resulting chunks in a linkedList
+
 
 
         byte[] buffer = new byte[sizeOfChunks]; // Create buffer to process 64K at a time
@@ -38,8 +48,8 @@ public class FileManager {
 
                 try (FileOutputStream out = new FileOutputStream(newFile)) {
                     out.write(buffer, 0, bytes);
-                    listOfFiles.add(newFile);
 
+                   files.add(newFile);
 
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
@@ -53,8 +63,78 @@ public class FileManager {
 
     }
 
+
+
+    public static void uploadFileList( String bucket_name, String key_prefix)
+    {
+
+
+        TransferManager xfer_mgr = new TransferManager();
+        try {
+            MultipleFileUpload xfer = xfer_mgr.uploadFileList(bucket_name,
+                    key_prefix, new File("."), files);
+            // loop with Transfer.isDone()
+            XferMgrProgress.showTransferProgress(xfer);
+            // or block with Transfer.waitForCompletion()
+            XferMgrProgress.waitForCompletion(xfer);
+        } catch (AmazonServiceException e) {
+            System.err.println(e.getErrorMessage());
+            System.exit(1);
+        }
+        xfer_mgr.shutdownNow();
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 public static void main(String [] args) throws IOException {
     splitUpload(new File("Z:\\tmp\\InputDir\\r.mp3"));
+
 }
 
 
