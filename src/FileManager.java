@@ -1,4 +1,9 @@
-import sun.awt.image.ImageWatched;
+/*
+ The Size of r.mp3 in the INputDir is 2.42 MB.
+ 40 files of 64K are created in the UploadDir with the size of the last part being 11KB
+
+
+  */
 
 import java.io.*;
 import java.util.LinkedList;
@@ -35,93 +40,27 @@ public class FileManager {
                     out.write(buffer, 0, bytes);
                     listOfFiles.add(newFile);
 
-                    Thread thread = new Thread() {
-                        @Override
-                        public void run()
 
-                        {
-                            retrieve(listOfFiles);
-                        }
-
-
-                    };
-                    thread.start();
-                }
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }catch (IOException e1){e1.printStackTrace();}
 
 
             }
-        }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        }catch ( RuntimeException e2)
+        {e2.printStackTrace();}
 
 
     }
 
+public static void main(String [] args) throws IOException {
+    splitUpload(new File("Z:\\tmp\\InputDir\\r.mp3"));
+}
 
 
 
+
+
+
+
+}
